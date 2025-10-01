@@ -1,74 +1,58 @@
 <?php
-// PUBLIC/INDEX.PHP - CON INSTALACIÓN INCORPORADA
+// PUBLIC/INDEX.PHP - VERSIÓN TEMPORAL SIMPLE
 
-// Configuración
+// Configuración básica
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');
 error_reporting(E_ALL);
 
-// Variables de entorno
-$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = 'prod';
-$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = '1';
-$_SERVER['APP_SECRET'] = $_ENV['APP_SECRET'] = 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6';
-$_SERVER['DATABASE_URL'] = $_ENV['DATABASE_URL'] = 'mysql://root:WC39ka10@@20.81.148.176:3306/uvdesk';
+echo "<h1>🚀 UVdesk - Estado de la Instalación</h1>";
+echo "<pre>";
 
+// Verificar vendor
+if (!file_exists('../vendor/autoload.php')) {
+    echo "❌ ERROR: vendor/autoload.php no encontrado\n";
+    echo "💡 SOLUCIÓN: Ejecuta 'composer install' primero\n";
+    exit;
+}
+
+require_once '../vendor/autoload.php';
+
+// Verificar comandos
 try {
-    require_once dirname(__DIR__).'/vendor/autoload.php';
+    $application = new Symfony\Component\Console\Application();
     
-    // VERIFICAR INSTALACIÓN ANTES DE CREAR KERNEL
-    $connection = new PDO(
-        'mysql:host=20.81.148.176;port=3306;dbname=uvdesk',
-        'root',
-        'WC39ka10@'
-    );
+    // Listar comandos disponibles
+    $commands = $application->all();
+    $commandList = [];
     
-    $tables = $connection->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
-    
-    if (empty($tables)) {
-        echo "📦 UVdesk no instalado. Ejecutando instalación...<br>";
-        
-        // Ejecutar instalación via Symfony Console
-        $application = new Symfony\Component\Console\Application();
-        $application->setAutoExit(false);
-        
-        // Configurar helpdesk con respuestas automáticas
-        $input = new Symfony\Component\Console\Input\ArrayInput([
-            'command' => 'uvdesk:configure-helpdesk',
-            '--env' => 'prod',
-            '--no-interaction' => true,
-        ]);
-        
-        $output = new Symfony\Component\Console\Output\BufferedOutput();
-        $application->run($input, $output);
-        echo nl2br($output->fetch());
-        
-        // Ejecutar migraciones
-        $input = new Symfony\Component\Console\Input\ArrayInput([
-            'command' => 'doctrine:migrations:migrate',
-            '--no-interaction' => true,
-            '--env' => 'prod',
-        ]);
-        
-        $output = new Symfony\Component\Console\Output\BufferedOutput();
-        $application->run($input, $output);
-        echo nl2br($output->fetch());
-        
-        echo "✅ Instalación completada. <a href='/'>Recargar página</a><br>";
-        exit;
+    foreach ($commands as $name => $command) {
+        $commandList[] = $name;
     }
     
-    // CONTINUAR CON APLICACIÓN NORMAL
-    $kernel = new App\Kernel($_ENV['APP_ENV'], (bool) $_ENV['APP_DEBUG']);
-    $request = Symfony\Component\HttpFoundation\Request::createFromGlobals();
-    $response = $kernel->handle($request);
-    $response->send();
-    $kernel->terminate($request, $response);
+    echo "Comandos disponibles (" . count($commandList) . "):\n";
+    foreach ($commandList as $cmd) {
+        echo "  - $cmd\n";
+    }
     
-} catch (Throwable $e) {
-    echo "<h1>Error UVdesk</h1>";
-    echo "<p><strong>" . $e->getMessage() . "</strong></p>";
-    echo "<pre>File: " . $e->getFile() . ":" . $e->getLine() . "</pre>";
+    // Verificar comandos específicos
+    $requiredCommands = ['uvdesk:configure-helpdesk', 'doctrine:migrations:migrate'];
+    foreach ($requiredCommands as $cmd) {
+        if (in_array($cmd, $commandList)) {
+            echo "✅ $cmd - DISPONIBLE\n";
+        } else {
+            echo "❌ $cmd - NO DISPONIBLE\n";
+        }
+    }
     
-    http_response_code(500);
+} catch (Exception $e) {
+    echo "❌ Error: " . $e->getMessage() . "\n";
 }
+
+echo "\n📝 Próximos pasos:\n";
+echo "1. Visita /check-composer.php para diagnóstico completo\n";
+echo "2. Si los comandos faltan, ejecuta 'composer install' manualmente\n";
+echo "3. O visita /manual-setup.php para instalación manual\n";
+
+echo "</pre>";
 ?>
