@@ -1,8 +1,11 @@
 {
+  "$schema": "https://railway.app/railway.schema.json",
   "build": {
-    "builder": "NIXPACKS"
+    "builder": "NIXPACKS",
+    "buildCommand": "composer install --no-dev --optimize-autoloader && php bin/console assets:install --symlink public && chmod +x start.sh"
   },
   "deploy": {
-    "startCommand": "cp -r . /app && chmod +x /app/bin/console && /app/bin/console uvdesk:configure-helpdesk --env=prod"
+    "startCommand": "./start.sh",
+    "restartPolicyType": "ON_FAILURE"
   }
 }

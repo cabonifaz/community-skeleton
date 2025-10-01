@@ -1,0 +1,24 @@
+[phases.setup]
+cmds = [
+    "apt-get update",
+    "apt-get install -y mysql-client apache2 libapache2-mod-php"
+]
+
+[phases.install]
+cmds = [
+    "composer install --no-dev --optimize-autoloader",
+    "php bin/console assets:install --symlink public"
+]
+
+[phases.build]
+cmds = [
+    "php bin/console cache:clear --env=prod",
+    "chmod +x start.sh"
+]
+
+[start]
+cmd = "./start.sh"
+
+[environment]
+APACHE_RUN_USER = "www-data"
+APACHE_RUN_GROUP = "www-data"
