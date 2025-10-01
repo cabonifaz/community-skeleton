@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "PORT=8080 php bin/console uvdesk:configure-helpdesk --env=prod && chmod -R 755 var/ public/ && php -S 0.0.0.0:8080 -t public/"
+    "startCommand": "php -S 0.0.0.0:8080 public/index.php"
   }
 }
