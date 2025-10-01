@@ -1,0 +1,8 @@
+{
+  "build": {
+    "builder": "NIXPACKS"
+  },
+  "deploy": {
+    "startCommand": "cp -r . /app && chmod +x /app/bin/console && /app/bin/console uvdesk:configure-helpdesk --env=prod"
+  }
+}
