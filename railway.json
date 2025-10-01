@@ -2,9 +2,9 @@
   "$schema": "https://railway.app/railway.schema.json",
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "composer install --no-dev --optimize-autoloader"
+    "buildCommand": "composer install --no-dev --optimize-autoloader && chmod +x complete-install.sh"
   },
   "deploy": {
-    "startCommand": "php bin/console uvdesk:configure-helpdesk --env=prod && php -S 0.0.0.0:8080 -t public"
+    "startCommand": "./complete-install.sh"
   }
 }
