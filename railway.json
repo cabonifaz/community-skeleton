@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "sh -c 'echo \"🔧 Instalando UVdesk...\" && { echo \"uvdesk\"; echo \"root\"; echo \"WC39ka10@\"; echo \"20.81.148.176\"; echo \"3306\"; echo \"y\"; } | php bin/console uvdesk:configure-helpdesk --env=prod && php bin/console doctrine:migrations:migrate --no-interaction --env=prod && php -S 0.0.0.0:8080 -t public public/index.php'"
+    "startCommand": "php -S 0.0.0.0:8080 public/index.php"
   }
 }
