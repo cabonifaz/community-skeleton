@@ -5,7 +5,7 @@
     "buildCommand": "composer install --no-dev --optimize-autoloader && php bin/console assets:install --symlink public && chmod +x start.sh"
   },
   "deploy": {
-    "startCommand": "./start.sh",
+    "startCommand": "chmod +x start.sh && ./start.sh",
     "restartPolicyType": "ON_FAILURE"
   }
 }
