@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "chmod -R 755 var/ public/ && php bin/console cache:clear --env=prod && php bin/console uvdesk:configure-helpdesk --env=prod && ./configure-apache.sh && apache2-foreground"
+    "startCommand": "PORT=8080 php bin/console uvdesk:configure-helpdesk --env=prod && chmod -R 755 var/ public/ && php -S 0.0.0.0:8080 -t public/"
   }
 }
