@@ -4,6 +4,6 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "printf 'uvdesk\\nroot\\nWC39ka10@\\n20.81.148.176\\n3306\\ny\\n' | php bin/console uvdesk:configure-helpdesk --env=prod && php -S 0.0.0.0:8080 -t public"
+    "startCommand": "php -S 0.0.0.0:8080 -t public public/index.php"
   }
 }

@@ -1,27 +1,48 @@
 <?php
+// PUBLIC/INDEX.PHP - VERSIÓN CORREGIDA
 
-// Cargar variables manualmente si no existen en Railway
-if (!isset($_SERVER['APP_ENV'])) {
-    $_SERVER['APP_ENV'] = 'prod';
-    $_ENV['APP_ENV'] = 'prod';
-}
-if (!isset($_SERVER['APP_SECRET'])) {
-    $_SERVER['APP_SECRET'] = 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6';
-    $_ENV['APP_SECRET'] = 'a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0u1v2w3x4y5z6';
-}
-if (!isset($_SERVER['DATABASE_URL'])) {
-    $_SERVER['DATABASE_URL'] = 'mysql://root:WC39ka10@@20.81.148.176:3306/uvdesk';
-    $_ENV['DATABASE_URL'] = 'mysql://root:WC39ka10@@20.81.148.176:3306/uvdesk';
-}
-
-// Habilitar errores
-error_reporting(E_ALL);
+// 1. Configuración de errores MÁXIMA
 ini_set('display_errors', '1');
+ini_set('display_startup_errors', '1');
+error_reporting(E_ALL);
 
-use App\Kernel;
+// 2. Headers para debug
+header('Content-Type: text/plain; charset=utf-8');
 
-require_once dirname(__DIR__).'/vendor/autoload_runtime.php';
+// 3. Variables de entorno FIJAS para desarrollo
+$_SERVER['APP_ENV'] = $_ENV['APP_ENV'] = $_SERVER['APP_ENV'] ?? $_ENV['APP_ENV'] ?? 'prod';
+$_SERVER['APP_DEBUG'] = $_ENV['APP_DEBUG'] = $_SERVER['APP_DEBUG'] ?? $_ENV['APP_DEBUG'] ?? '1';
+$_SERVER['APP_SECRET'] = $_ENV['APP_SECRET'] = $_SERVER['APP_SECRET'] ?? $_ENV['APP_SECRET'] ?? 'dev_secret_123456789';
+$_SERVER['DATABASE_URL'] = $_ENV['DATABASE_URL'] = $_SERVER['DATABASE_URL'] ?? $_ENV['DATABASE_URL'] ?? 'mysql://root:WC39ka10@@20.81.148.176:3306/uvdesk';
 
-return function (array $context) {
-    return new Kernel($context['APP_ENV'], (bool) $context['APP_DEBUG']);
-};
+echo "🚀 Iniciando UVdesk...\n";
+echo "APP_ENV: " . $_ENV['APP_ENV'] . "\n";
+echo "DATABASE_URL: " . ($_ENV['DATABASE_URL'] ? 'SET' : 'NOT SET') . "\n";
+
+try {
+    // 4. Cargar autoloader
+    if (!file_exists(dirname(__DIR__).'/vendor/autoload.php')) {
+        throw new RuntimeException('Vendor autoload no encontrado.');
+    }
+    
+    require_once dirname(__DIR__).'/vendor/autoload.php';
+    echo "✅ Autoload cargado\n";
+
+    // 5. Crear y ejecutar kernel
+    $kernel = new App\Kernel($_ENV['APP_ENV'], (bool) $_ENV['APP_DEBUG']);
+    echo "✅ Kernel creado\n";
+    
+    // 6. Manejar la request
+    $request = Symfony\Component\HttpFoundation\Request::createFromGlobals();
+    $response = $kernel->handle($request);
+    $response->send();
+    $kernel->terminate($request, $response);
+    
+} catch (Throwable $e) {
+    echo "❌ ERROR CRÍTICO:\n";
+    echo "Message: " . $e->getMessage() . "\n";
+    echo "File: " . $e->getFile() . ":" . $e->getLine() . "\n";
+    echo "Trace:\n" . $e->getTraceAsString() . "\n";
+    http_response_code(500);
+}
+?>
